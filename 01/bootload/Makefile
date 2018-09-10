@@ -34,25 +34,25 @@ LFLAGS = -static -T ld.scr -L.
 .SUFFIXES: .c .o
 .SUFFIXES: .s .o
 
-all : $(TARGET)
+all :       $(TARGET)
 
 $(TARGET) : $(OBJS)
-            $(CC) $(OBJS) -o $(TARGET) $(CFLAGS) $(LFLAGS)
-            cp $(TARGET) $(TARGET).elf
-            $(STRIP) $(TARGET)
+        $(CC) $(OBJS) -o $(TARGET) $(CFLAGS) $(LFLAGS)
+        cp $(TARGET) $(TARGET).elf
+        $(STRIP) $(TARGET)
 
-.c.o :      $<
-            $(CC) -c $(CFLAGS) $<
+.c.o :           $<
+                 $(CC) -c $(CFLAGS) $<
 
-.s.o :      $<
-            $(CC) -c $(CFLAGS) $<
+.s.o :           $<
+                 $(CC) -c $(CFLAGS) $<
 
-$(TARGET).mot : $(TARGET)
-                $(OBJCOPY) -O srec $(TARGET) $(TARGET).mot
+$(TARGET).mot :  $(TARGET)
+                 $(OBJCOPY) -O srec $(TARGET) $(TARGET).mot
 
-image :         $(TARGET).mot
+image :          $(TARGET).mot
 
-write :         $(TARGET).mot
-                $(H8WRITE) -3069 -f20 $(TARGET).mot $(H8WRITE_SERDEV)
+write :          $(TARGET).mot
+                 $(H8WRITE) -3069 -f20 $(TARGET).mot $(H8WRITE_SERDEV)
 
-clean :         rm -f $(OBJS) $(TARGET) $(TARGET).elf $(TARGET).mot        
+clean :          rm -f $(OBJS) $(TARGET) $(TARGET).elf $(TARGET).mot        
