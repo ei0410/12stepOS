@@ -7,7 +7,7 @@
 #define H8_3069F_SCI1 ((volatile struct h8_3069f_sci *)0xffffb8)
 #define H8_3069F_SCI2 ((volatile struct h8_3069f_sci *)0xffffc0)
 
-struct h8_3069f_sci {
+struct h8_3069f_sci { //define SCI register
     volatile uint8 smr;
     volatile uint8 brr;
     volatile uint8 scr;
@@ -17,6 +17,7 @@ struct h8_3069f_sci {
     volatile uint8 scmr;
 };
 
+//define each bits for SMR
 #define H8_3069F_SCI_SMR_CKS_PER1  (0<<0)
 #define H8_3069F_SCI_SMR_CKS_PER4  (1<<0)
 #define H8_3069F_SCI_SMR_CKS_PER16 (2<<0)
@@ -28,23 +29,25 @@ struct h8_3069f_sci {
 #define H8_3069F_SCI_SMR_CHR       (1<<6)
 #define H8_3069F_SCI_SMR_CA        (1<<7)
 
+//define each bits for SCR
 #define H8_3069F_SCI_SCR_CKE0      (1<<0)
 #define H8_3069F_SCI_SCR_CKE1      (1<<1)
 #define H8_3069F_SCI_SCR_TEIE      (1<<2)
 #define H8_3069F_SCI_SCR_MPIE      (1<<3)
-#define H8_3069F_SCI_SCR_RE        (1<<4)
-#define H8_3069F_SCI_SCR_TE        (1<<5)
-#define H8_3069F_SCI_SCR_RIE       (1<<6)
-#define H8_3069F_SCI_SCR_TIE       (1<<7)
+#define H8_3069F_SCI_SCR_RE        (1<<4) //enable subscribe
+#define H8_3069F_SCI_SCR_TE        (1<<5) //enable publish
+#define H8_3069F_SCI_SCR_RIE       (1<<6) //enable interupt for subscribe
+#define H8_3069F_SCI_SCR_TIE       (1<<7) //enable interupt for publish
 
+//define each bits for SSR
 #define H8_3069F_SCI_SSR_MPBT      (1<<0)
 #define H8_3069F_SCI_SSR_MPB       (1<<1)
 #define H8_3069F_SCI_SSR_TEND      (1<<2)
 #define H8_3069F_SCI_SSR_PER       (1<<3)
 #define H8_3069F_SCI_SSR_FERERS    (1<<4)
 #define H8_3069F_SCI_SSR_ORER      (1<<5)
-#define H8_3069F_SCI_SSR_RDRF      (1<<6)
-#define H8_3069F_SCI_SSR_TDRE      (1<<7)
+#define H8_3069F_SCI_SSR_RDRF      (1<<6) //finish subscribe
+#define H8_3069F_SCI_SSR_TDRE      (1<<7) //finish publish
 
 static struct {
     volatile struct h8_3069f_sci *sci;
@@ -60,8 +63,8 @@ int serial_init(int index)
 
     sci->scr = 0;
     sci->smr = 0;
-    sci->brr = 64;
-    sci->scr = H8_3069F_SCI_SCR_RE | H8_3069F_SCI_SCR_TE;
+    sci->brr = 64; //20MHz Clocks generate 9600bps
+    sci->scr = H8_3069F_SCI_SCR_RE | H8_3069F_SCI_SCR_TE; //enable subscribe and publish
     sci->ssr = 0;
 
     return 0;
