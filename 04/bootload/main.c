@@ -1,5 +1,6 @@
 #include "defines.h"
 #include "serial.h"
+#include "xmodem.h"
 #include "lib.h"
 
 static int init(void)
@@ -15,35 +16,70 @@ static int init(void)
     return 0;
 }
 
-int global_data = 0x10;
-int global_bss;
-static int static_data = 0x20;
-static int static_bss;
-
-static void printval(void)
+//hex dump output of memories
+static int dump(char *buf, long size)
 {
-    puts("global_data = "); putxval(global_data, 0); puts("\n");
-    puts("global_bss  = "); putxval(global_bss , 0); puts("\n");
-    puts("static_data = "); putxval(static_data, 0); puts("\n");
-    puts("static_bss  = "); putxval(static_bss , 0); puts("\n");
+    long i;
+
+    if (size < 0) {
+        puts("no data.\n");
+        return -1;
+    }
+    for (i = 0; i < size; i++) {
+        putxval(buf[i], 2);
+        if ((i & 0xf) == 15) {
+            puts("\n");
+        } else {
+            if ((i & 0xf) == 7) puts(" ");
+            puts(" ");
+        }
+    }
+    puts("\n");
+
+    return 0;
+}
+
+//service function for wait
+static void wait()
+{
+    volatile long i;
+    for (i = 0; i < 300000; i++) 
+        ;
 }
 
 int main(void)
 {
+    static char buf[16];
+    static long size = -1;
+    static unsigned char *loadbuf = NULL;
+    extern int buffer_start; //defined buffer by link script
+
     init();
-    puts("Hello World!\n");
 
-    printval();
-    puts("overwrite variables.\n");
-    global_data = 0x20;
-    global_bss  = 0x30;
-    static_data = 0x40;
-    static_bss  = 0x50;
-    printval();
+    puts("kzload (kozos boot loader) started.\n");
 
-    while(1) {
-        ;
+    while (1) {
+        puts("kzload> "); //show prompt
+        gets(buf); //receive command from serial
+
+        if (!strcmp(buf, "load")) { //download xmodem files
+            loadbuf = (char *)(&buffer_start);
+            size = xmodem_recv(loadbuf);
+            wait(); //wait while send app finish and return terminal
+            if (size < 0) {
+                puts("\nXMODEM receive error!\n");
+            } else {
+                puts("\nXMODEM receive succeeded.\n");
+            }
+        } else if (!strcmp(buf, "dump")) { //hex dump output of memories
+            puts("size: ");
+            putxval(size, 0);
+            puts("\n");
+            dump(loadbuf, size);
+        } else {
+            puts("unknown.\n");
+        }
     }
-
+    
     return 0;
 }

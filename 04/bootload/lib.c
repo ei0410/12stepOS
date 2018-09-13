@@ -82,11 +82,33 @@ int putc(unsigned char c) //publish a charactor
     return serial_send_byte(SERIAL_DEFAULT_DEVICE, c);
 }
 
+unsigned char getc(void) //receive a charactor from console
+{
+    unsigned char c = serial_recv_byte(SERIAL_DEFAULT_DEVICE);
+    c = (c == '\r') ? '\n' : c; //convert
+    putc(c); //echo back
+    return c;
+}
+
 int puts(unsigned char *str) //publish strings
 {
     while(*str)
         putc(*(str++));
     return 0;
+}
+
+int gets(unsigned char *buf)
+{
+    int i = 0;
+    unsigned char c;
+
+    do {
+        c = getc();
+        if (c == '\n')
+            c = '\0';
+        buf[i++] = c;
+    } while (c);
+    return i - 1;
 }
 
 //show value using hexadecimal
