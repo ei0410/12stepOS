@@ -1,6 +1,7 @@
 #include "defines.h"
 #include "serial.h"
 #include "xmodem.h"
+#include "elf.h"
 #include "lib.h"
 
 static int init(void)
@@ -76,7 +77,9 @@ int main(void)
             putxval(size, 0);
             puts("\n");
             dump(loadbuf, size);
-        } else {
+        } else if (!strcmp(buf, "run")) { //run elf file
+			elf_load(loadbuf); //spread on memories
+		} else {
             puts("unknown.\n");
         }
     }
