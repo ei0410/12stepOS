@@ -6,5 +6,11 @@ int serial_is_send_enable(int index);
 int serial_send_byte(int index, unsigned char b);
 int serial_is_recv_enable(int index);
 unsigned char serial_recv_byte(int index);
+int serial_intr_is_send_enable(int index); // confirm send enable or not
+void serial_intr_send_enable(int index);   // enable send
+void serial_intr_send_disable(int index);  // disable send 
+int serial_intr_is_recv_enable(int index); // confirm send enable or not
+void serial_intr_recv_enable(int index);   // enable recv
+void serial_intr_recv_disable(int index);  // disable recv
 
 #endif

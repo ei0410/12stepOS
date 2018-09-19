@@ -1,26 +1,15 @@
 #include "defines.h"
+#include "intr.h"
+#include "interrupt.h"
 #include "serial.h"
 #include "lib.h"
 
+static void intr(softvec_type_t type, unsigned long sp)
+{
+
+}
+
 int main(void)
 {
-	static char buf[32];
 
-	puts("Hello World!\n");
-
-	while (1) {
-		puts("> ");
-		gets(buf); //input from console
-
-		if (!strncmp(buf, "echo", 4)) {
-			puts(buf + 4);
-			puts("\n");
-		} else if (!strcmp(buf, "exit")) {
-			break;
-		} else {
-			puts("unknown.\n");
-		}
-	}
-
-	return 0;
 }
