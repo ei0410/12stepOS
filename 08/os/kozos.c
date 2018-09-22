@@ -102,7 +102,7 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name, int stacksize, int 
 
 	// search for void TCB
 	for (i = 0; i < THREAD_NUM; i++) {
-		thp = &threads[i]
+		thp = &threads[i];
 		if (!thp->init.func) // find out
 			break;
 	}
@@ -197,7 +197,7 @@ static void syscall_proc(kz_syscall_type_t type, kz_syscall_param_t *p)
 
 static void schedule(void)
 {
-	if (!readque.head) // not found
+	if (!readyque.head) // not found
 		kz_sysdown();
 	
 	current = readyque.head;

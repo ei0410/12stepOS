@@ -12,7 +12,7 @@ int test08_1_main(int argc, char *argv[])
 		puts("> ");
 		gets(buf);
 
-		if (!strcmp(buf, "echo", 4)) {
+		if (!strncmp(buf, "echo", 4)) {
 			puts(buf + 4);
 			puts("\n");
 		} else if (!strcmp(buf, "exit")) {
@@ -22,7 +22,7 @@ int test08_1_main(int argc, char *argv[])
 		}
 	}
 
-	putrs("test08_1 exit.\n");
+	puts("test08_1 exit.\n");
 
 	return 0;
 }
