@@ -160,3 +160,102 @@ static int thread_exit(void)
 	memset(current, 0, sizeof(*current)); // clear TCB
 	return 0;
 }
+
+// regist interrupt handler
+static int setintr(softvec_type_t type, kz_handler_t handler)
+{
+	static void thread_intr(softvec_type_t type, unsigned long sp);
+
+	softvec_setintr(type, thread_intr);
+
+	handlers[type] = handler;
+
+	return 0;
+}
+
+static void call_functions(kz_syscall_type_t type, kz_syscall_param_t *p)
+{
+	// warn change current while run syscall
+	switch (type) {
+		case KZ_SYSCALL_TYPE_RUN:
+			p->un.run.ret = thread_run(p->un.run.func, p->un.run.name, p->un.run.stacksize, p->un.run.argc, p->un.run.argv);
+			break;
+		case KZ_SYSCALL_TYPE_EXIT:
+		// don't write return value because TCB delete
+			thread_exit();
+			break;
+		default:
+			break;
+	}
+}
+
+static void syscall_proc(kz_syscall_type_t type, kz_syscall_param_t *p) 
+{
+	getcurrent();
+	call_functions(type, p);
+}
+
+static void schedule(void)
+{
+	if (!readque.head) // not found
+		kz_sysdown();
+	
+	current = readyque.head;
+}
+
+static void syscall_intr(void)
+{
+	syscall_proc(current->syscall.type, current->syscall.param);
+}
+
+static void softerr_intr(void)
+{
+	puts(current->name);
+	puts(" DOWN.\n");
+	getcurrent(); // get out from readyque
+	thread_exit();
+}
+
+static void thread_intr(softvec_type_t type, unsigned long sp)
+{
+	current->context.sp = sp; // save context of current thread to TCB
+
+	if (handlers[type])
+		handlers[type]();
+	
+	schedule();
+
+	dispatch(&current->context);
+}
+
+void kz_start(kz_func_t func, char *name, int stacksize, int argc, char *argv[])
+{
+	current = NULL;
+	
+	// init
+	readyque.head = readyque.tail = NULL;
+	memset(threads,  0, sizeof(threads));
+	memset(handlers, 0, sizeof(handlers));
+
+	// regist
+	setintr(SOFTVEC_TYPE_SYSCALL, syscall_intr);
+	setintr(SOFTVEC_TYPE_SOFTERR, softerr_intr);
+
+	current = (kz_thread *)thread_run(func, name, stacksize, argc, argv);
+
+	dispatch(&current->context);
+}
+
+void kz_sysdown(void)
+{
+	puts("system error!\n");
+	while (1)
+		;
+}
+
+void kz_syscall(kz_syscall_type_t type, kz_syscall_param_t *param)
+{
+	current->syscall.type  = type;
+	current->syscall.param = param;
+	asm volatile ("trapa #0");
+}
