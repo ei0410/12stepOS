@@ -148,7 +148,7 @@ static kz_thread_id_t thread_run(kz_func_t func, char *name, int priority, int s
 	*(--sp) = (uint32)thread_end;
 
 	// set PC
-	*(--sp) = (uint32)thread_init | ((uint32)(priority ? 0 : 0xc0) << 24;
+	*(--sp) = (uint32)thread_init | ((uint32)(priority ? 0 : 0xc0) << 24);
 
 	*(--sp) = 0; /* ER6 */
 	*(--sp) = 0; /* ER5 */
