@@ -283,8 +283,11 @@ static void sendmsg(kz_msgbox *mboxp, kz_thread *thp, int size, char *p)
 // receive message
 static void recvmsg(kz_msgbox *mboxp)
 {
+	kz_msgbuf *mp;
+	kz_syscall_param_t *p;
+
 	// get message at head of message box
-	kz_msgbuf->head;
+	mp = mboxp->head;
 	mboxp->head = mp->next;
 	if (mboxp->head == NULL)
 		mboxp->tail = NULL;
@@ -385,7 +388,7 @@ static void call_functions(kz_syscall_type_t type, kz_syscall_param_t *p)
 			p->un.kmfree.ret = thread_kmfree(p->un.kmfree.p);
 			break;
 		case KZ_SYSCALL_TYPE_SEND:
-			p->un.send.ret = thread_send(p->un.send.id, p->un.send.sizep, p->un.send.pp);
+			p->un.send.ret = thread_send(p->un.send.id, p->un.send.size, p->un.send.p);
 			break;
 		case KZ_SYSCALL_TYPE_RECV:
 			p->un.recv.ret = thread_recv(p->un.recv.id, p->un.recv.sizep, p->un.recv.pp);
