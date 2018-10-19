@@ -13,20 +13,21 @@ OBJDUMP = $(BINDIR)/$(ADDNAME)objdump
 RANLIB  = $(BINDIR)/$(ADDNAME)ranlib
 STRIP   = $(BINDIR)/$(ADDNAME)strip
 
-OBJS  = startup.o main.o interrupt.o
-OBJS += lib.o serial.o
+H8WRITE = ../../tools/h8write/h8write
 
-# source of kozos
-OBJS += kozos.o syscall.o memory.o consdrv.o command.o
+H8WRITE_SERDEV = /dev/ttyUSB0
 
-TARGET = kozos
+OBJS  = vector.o startup.o intr.o main.o interrupt.o
+OBJS += lib.o serial.o xmodem.o elf.o
+
+TARGET = kzload
 
 CFLAGS  = -Wall -mh -nostdinc -nostdlib -fno-builtin
 #CFLAGS += -mint32
 CFLAGS += -I.
 #CFLAGS += -g
 CFLAGS += -Os
-CFLAGS += -DKOZOS
+CFLAGS += -DKZLOAD
 
 LFLAGS = -static -T ld.scr -L.
 
@@ -50,5 +51,13 @@ $(TARGET) :	$(OBJS)
 .S.o :		$<
 		$(CC) -c $(CFLAGS) $<
 
+$(TARGET).mot :	$(TARGET)
+		$(OBJCOPY) -O srec $(TARGET) $(TARGET).mot
+
+image :		$(TARGET).mot
+
+write :		$(TARGET).mot
+		$(H8WRITE) -3069 -f20 $(TARGET).mot $(H8WRITE_SERDEV)
+
 clean :
-		rm -f $(OBJS) $(TARGET) $(TARGET).elf
+		rm -f $(OBJS) $(TARGET) $(TARGET).elf $(TARGET).mot        

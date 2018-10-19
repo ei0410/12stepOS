@@ -411,7 +411,7 @@ static void syscall_proc(kz_syscall_type_t type, kz_syscall_param_t *p)
 static void srvcall_proc(kz_syscall_type_t type, kz_syscall_param_t *p)
 {
 	current = NULL;
-	call_function(type, p);
+	call_functions(type, p);
 }
 
 static void schedule(void)

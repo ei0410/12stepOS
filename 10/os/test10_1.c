@@ -21,7 +21,7 @@ int test10_1_main(int argc, char *argv[])
 		p2[j] = '\0';
 
 		putxval((unsigned long)p1, 8); puts(" "); puts(p1); puts("\n");
-		putxval((unsigned long)p2, 8); puts(" "); puts(p1); puts("\n");
+		putxval((unsigned long)p2, 8); puts(" "); puts(p2); puts("\n");
 
 		kz_kmfree(p1);
 		kz_kmfree(p2);

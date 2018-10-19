@@ -65,6 +65,7 @@ static int consdrv_intrproc(struct consreg *cons)
 				p = kx_kmalloc(CONS_BUFFER_SIZE);
 				memcpy(p, cons->recv_buf, cons->recv_len);
 				kx_send(MSGBOX_ID_CONSINPUT, cons->recv_len, p);
+				cons->recv_len = 0;
 			}
 		}
 	}
@@ -90,9 +91,10 @@ static void consdrv_intr(void)
 	for (i = 0; i < CONSDRV_DEVICE_NUM; i++) {
 		cons = &consreg[i];
 		if (cons->id) {
-			if (serial_is_send_enable(cons->index) || serial_is_recv_enable(cons->index))
+			if (serial_is_send_enable(cons->index) || serial_is_recv_enable(cons->index)) {
 				// if interrupt exist, call function
 				consdrv_intrproc(cons);
+			}
 		}
 	}
 }
@@ -135,7 +137,7 @@ int consdrv_main(int argc, char *argv[])
 	char *p;
 
 	consdrv_init();
-	kz_setintr(SOFTVEC_TYPE_SETINTR, consdrv_intr);
+	kz_setintr(SOFTVEC_TYPE_SERINTR, consdrv_intr);
 
 	while (1) {
 		id = kz_recv(MSGBOX_ID_CONSOUTPUT, &size, &p);

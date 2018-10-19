@@ -94,7 +94,7 @@ kz_thread_id_t kz_recv(kz_msgbox_id_t id, int *sizep, char **pp)
 	return param.un.recv.ret;
 }
 
-kz_thread_id_t kz_recv(kz_msgbox_id_t type, kz_handler_t handler)
+int kz_setintr(softvec_type_t type, kz_handler_t handler)
 {
 	kz_syscall_param_t param;
 	param.un.setintr.type = type;
